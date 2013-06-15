@@ -10,6 +10,7 @@ class Randomizer
 	protected $database;
 
 	protected $connection;
+	protected $data;
 
 	function __construct($host, $user, $pass, $db) {
 		$this->hostname = $host;
@@ -33,12 +34,16 @@ class Randomizer
 	}
 
 	// randomize main function
-	public function randomize($table, $column, $values) {
-		$result = mysql_query('SELECT ' . $column . ' FROM ' . $table . ';', $this->connection);
+	public function randomize($table, $values) {
+		
+		//$this->updateOperation($table, $values);
+		$this->deleteOperation($table);
 
-		while ($row = mysql_fetch_assoc($result)) {
-			var_dump($row);
-		}
+		//$result = mysql_query('SELECT ' . $column . ' FROM ' . $table . ';', $this->connection);
+
+		//while ($row = mysql_fetch_assoc($result)) {
+		//	var_dump($row);
+		//}
 	}
 
 	// gets random operation - insert, update, delete
@@ -58,6 +63,70 @@ class Randomizer
 		return mt_rand(0, $length); 
 	}
 
+	// insert random values to a table
+	private function insertOperation($table, $temp_array) {
+
+		// new values' array
+		$new_array = array();
+		
+		// for fetching via index
+		$temp_values = array_values($temp_array);
+		$temp_keys = array_keys($temp_array);
+		
+		// get random row for each column
+		for ( $i = 0; $i < sizeof($temp_array); $i++ ) {
+			$random_row = $this->getRandom(sizeof($temp_values[$i])-1);
+			echo $temp_keys[$i] . ' -> ' . $temp_array[$temp_keys[$i]][$random_row] . '<br>';
+			array_push($new_array, "'" . $temp_array[$temp_keys[$i]][$random_row] . "'");
+		} 
+
+		// implode with comma for insert operation
+		$new_values = implode(",", $new_array);
+
+		// insertion
+		mysql_query('INSERT INTO ' . $table . ' VALUES ( "", ' . $new_values . ');', $this->connection) or die(mysql_error());
+
+		echo "Successfully Inserted!";
+	}
+
+	// update random value of a table
+	private function updateOperation($table, $temp_array) {
+		
+		// for fetching via index
+		$temp_values = array_values($temp_array);
+		$temp_keys = array_keys($temp_array);
+		
+		// random key and value selected 
+		$random_column = $this->getRandom(sizeof($temp_keys)-1);
+		$random_row = $this->getRandom(sizeof($temp_values[$random_column])-1);
+		
+		echo $temp_keys[$random_column] . ' -> ' . $temp_array[$temp_keys[$random_column]][$random_row] . '<br>';
+
+		// get random array from sql table
+		$result = mysql_query('SELECT ID FROM ' . $table . ' LIMIT 1;', $this->connection) or die(mysql_error());
+		$random_id = mysql_fetch_row($result);
+		
+		// update query
+		mysql_query('UPDATE ' . $table . ' SET ' . $temp_keys[$random_column] . '="' . $temp_array[$temp_keys[$random_column]][$random_row] . '" WHERE ID = "' . $random_id[0] . '";', $this->connection) or die(mysql_error());
+
+		echo "Successfully Updated!";
+	}	
+
+
+	// update random value of a table
+	private function deleteOperation($table) {
+	
+
+		// get random array from sql table
+		$result = mysql_query('SELECT ID FROM ' . $table . ' LIMIT 1;', $this->connection) or die(mysql_error());
+		$random_id = mysql_fetch_row($result);
+		
+		// update query
+		mysql_query('DELETE FROM ' . $table . ' WHERE ID = "' . $random_id[0] . '";', $this->connection) or die(mysql_error());
+
+		echo "Successfully Deleted!";
+	}	  
+
 } 
 	
 // pass database config
@@ -71,5 +140,5 @@ $values = array(
 	'status' => array('Banned', 'Active')
 	);
 
-//$obj->randomize("table1", $values);
+$obj->randomize("table1", $values);
 ?>
