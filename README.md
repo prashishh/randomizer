@@ -12,7 +12,7 @@ Randomly insert, update or delete data from SQL table(s). Used in demo for real 
 // pass database config
 $obj = new Randomizer("<hostname>", "<username>", "<password>", "<tablename>");
 ```
-`parameters are self-explanatory`
+__parameters__ are self-explanatory
 
 ```php
 // assign random values to columns
@@ -28,11 +28,30 @@ Their respective arrays are the values that you want to assign them.```
 
 ```php
 // call this function to start operation
-$obj->randomize("table1", $values);
+$obj->randomize(<tablename>, <values array>);
 ```
 
-`Note: If you want to change values of your db repeatedly (for real-time apps demo) then call this page with setInterval() or similar function`
+__Note:__ If you want to change values of your db repeatedly (for real-time apps demo) then call this page with setInterval() or similar function
 
+### Full Code Example:
+
+```php
+	
+// pass database config
+$obj = new Randomizer("localhost", "root", "", "tabledata");
+
+// assign random values to columns
+$values = array(
+	'username' => array('Ram Prasad', 'Hari Gopal', 'Shyam Kesari'), 
+	'datereg' => array('2012/01/11', '2013/01/11', '2012/05/12'), 
+	'role' => array('Staff', 'Teacher', 'Lecturer'), 
+	'status' => array('Banned', 'Active')
+	);
+
+// call this function to start operation
+$obj->randomize("table1", $values);
+
+```
 #### Update: 
 A quick search gave me this [result][so] from stackoverflow:
 
