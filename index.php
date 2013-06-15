@@ -36,14 +36,15 @@ class Randomizer
 	// randomize main function
 	public function randomize($table, $values) {
 		
-		//$this->updateOperation($table, $values);
-		$this->deleteOperation($table);
+        $operation = $this->getOperation();
 
-		//$result = mysql_query('SELECT ' . $column . ' FROM ' . $table . ';', $this->connection);
+        if($operation == 'insert')
+			$this->insertOperation($table, $values);
+		else if($operation == 'update')
+			$this->updateOperation($table, $values);
+		else
+			$this->deleteOperation($table);
 
-		//while ($row = mysql_fetch_assoc($result)) {
-		//	var_dump($row);
-		//}
 	}
 
 	// gets random operation - insert, update, delete
@@ -116,7 +117,6 @@ class Randomizer
 	// update random value of a table
 	private function deleteOperation($table) {
 	
-
 		// get random array from sql table
 		$result = mysql_query('SELECT ID FROM ' . $table . ' LIMIT 1;', $this->connection) or die(mysql_error());
 		$random_id = mysql_fetch_row($result);
@@ -140,5 +140,9 @@ $values = array(
 	'status' => array('Banned', 'Active')
 	);
 
+// call this function to start operation
 $obj->randomize("table1", $values);
+
+// 
+
 ?>
