@@ -8,7 +8,7 @@ class Randomizer
 	protected $password;
 	protected $portnumber;
 	protected $database;
-
+	protected $PrimaryField = "ID";
 	protected $connection;
 	protected $data;
 
@@ -34,7 +34,8 @@ class Randomizer
 	}
 
 	// randomize main function
-	public function randomize($table, $values) {
+	public function randomize($table, $values, $primary_field = "ID") {
+	$this->PrimaryField = $primary_field; 
 		
         $operation = $this->getOperation();
 
@@ -63,6 +64,7 @@ class Randomizer
 	private function getRandom($length) {
 		return mt_rand(0, $length); 
 	}
+	
 
 	// insert random values to a table
 	private function insertOperation($table, $temp_array) {
@@ -122,10 +124,14 @@ class Randomizer
 		$random_id = mysql_fetch_row($result);
 		
 		// update query
-		mysql_query('DELETE FROM ' . $table . ' WHERE ID = "' . $random_id[0] . '";', $this->connection) or die(mysql_error());
+		mysql_query('DELETE FROM ' . $table . ' WHERE '.$this->PrimaryField.' = "' . $random_id[0] . '";', $this->connection) or die(mysql_error());
 
 		echo "Successfully Deleted!";
-	}	  
+	}
+	
+	public function setPrimaryField($value){
+		$this->PrimaryField = $value;
+	}
 
 } 
 
