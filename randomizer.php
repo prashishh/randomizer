@@ -8,10 +8,10 @@ class Randomizer
 	protected $password;
 	protected $portnumber;
 	protected $database;
-
+	protected $error; 
 	protected $connection;
 	protected $data;
-
+	protected $op = array(0=>"insert", 1=>"update", 2=>"delete"); //mimimizes the use of function
 	function __construct($host, $user, $pass, $db) {
 		$this->hostname = $host;
 		$this->username = $user;
@@ -24,44 +24,46 @@ class Randomizer
 	// create database connection 
 	private function connectDatabase() {
 		
-		$this->connection = mysql_connect($this->hostname,$this->username,$this->password);
-		mysql_select_db($this->database, $this->connection);
+		if($this->connection = mysql_connect($this->hostname,$this->username,$this->password)){ 
+			$this->error="Could not connect to databse. Search more for MySQL Error #".mysql_errno();
+			return false;
+		}
+		if(mysql_select_db($this->database, $this->connection)){
+			$this->error = "Could not select the databse. Search more for MySQL Error #". mysql_errno();
+			return false;
+		}
+		return true;
 	}
 
 	// close database connection
 	private function closeDatabase() {
-		mysql_close($this->connection);
+		if($this->connection){mysql_close($this->connection)}
 	}
 
 	// randomize main function
 	public function randomize($table, $values) {
 		
-        $operation = $this->getOperation();
+        $operation = $this->op[$this->getRandom(2)];
 
         if($operation == 'insert')
-			$this->insertOperation($table, $values);
+			return $this->insertOperation($table, $values);
 		else if($operation == 'update')
-			$this->updateOperation($table, $values);
+			return $this->updateOperation($table, $values);
 		else
-			$this->deleteOperation($table);
+			return $this->deleteOperation($table);
 
 	}
 
-	// gets random operation - insert, update, delete
-	private function getOperation() {
-		$operation = $this->getRandom(2);
-
-		if ( $operation == 0 )
-			return "insert";
-		else if ($operation == 1 )
-			return "update";
-		else
-			return "delete";
-	}
+	
 	
 	// gets random number, input string
 	private function getRandom($length) {
 		return mt_rand(0, $length); 
+	}
+	
+	
+	public function randomizer_error(){
+		return $this->error;
 	}
 
 	// insert random values to a table
@@ -85,9 +87,11 @@ class Randomizer
 		$new_values = implode(",", $new_array);
 
 		// insertion
-		mysql_query('INSERT INTO ' . $table . ' VALUES ( "", ' . $new_values . ');', $this->connection) or die(mysql_error());
-
-		echo "Successfully Inserted!";
+		if(!mysql_query('INSERT INTO ' . $table . ' VALUES ( "", ' . $new_values . ');', $this->connection)){
+			$this->error = "Could not Insert to Database. MySQL Error: ". mysql_error();
+			return false;	
+		} 
+		return true;
 	}
 
 	// update random value of a table
@@ -108,13 +112,15 @@ class Randomizer
 		$random_id = mysql_fetch_row($result);
 		
 		// update query
-		mysql_query('UPDATE ' . $table . ' SET ' . $temp_keys[$random_column] . '="' . $temp_array[$temp_keys[$random_column]][$random_row] . '" WHERE ID = "' . $random_id[0] . '";', $this->connection) or die(mysql_error());
-
-		echo "Successfully Updated!";
+		if(!mysql_query('UPDATE ' . $table . ' SET ' . $temp_keys[$random_column] . '="' . $temp_array[$temp_keys[$random_column]][$random_row] . '" WHERE ID = "' . $random_id[0] . '";', $this->connection)){
+			$this->error = "Could not Update in Databse. MySQL Error: ". mysql_error();
+			return false;
+		}
+		return true;
 	}	
 
 
-	// update random value of a table
+	// delete random record of a table
 	private function deleteOperation($table) {
 	
 		// get random array from sql table
@@ -122,10 +128,17 @@ class Randomizer
 		$random_id = mysql_fetch_row($result);
 		
 		// update query
-		mysql_query('DELETE FROM ' . $table . ' WHERE ID = "' . $random_id[0] . '";', $this->connection) or die(mysql_error());
+		if(!mysql_query('DELETE FROM ' . $table . ' WHERE ID = "' . $random_id[0] . '";', $this->connection)){
+			$this->error = "Could not Delete from Database. MySQL Error: ". mysql_error(); 
+			return false;
+		}
 
-		echo "Successfully Deleted!";
+		return true;
 	}	  
+	
+	public function __destruct(){
+		$this->closeDatabase();
+	}
 
 } 
 
