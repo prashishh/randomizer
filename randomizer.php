@@ -10,6 +10,7 @@ class Randomizer
 	protected $database;
 	protected $error; 
 	protected $connection;
+	protected $PrimaryField =  "ID";
 	protected $data;
 	protected $op = array(0=>"insert", 1=>"update", 2=>"delete"); //mimimizes the use of function
 	function __construct($host, $user, $pass, $db) {
@@ -41,8 +42,8 @@ class Randomizer
 	}
 
 	// randomize main function
-	public function randomize($table, $values) {
-		
+	public function randomize($table, $values, $primay_field = "ID") {
+	$this->PrimaryField = $primary_field;		
         $operation = $this->op[$this->getRandom(2)];
 
         if($operation == 'insert')
@@ -128,13 +129,23 @@ class Randomizer
 		$random_id = mysql_fetch_row($result);
 		
 		// update query
-		if(!mysql_query('DELETE FROM ' . $table . ' WHERE ID = "' . $random_id[0] . '";', $this->connection)){
+		if(!mysql_query('DELETE FROM ' . $table . ' WHERE '.$this->PrimaryField.'= "' . $random_id[0] . '";', $this->connection)){
 			$this->error = "Could not Delete from Database. MySQL Error: ". mysql_error(); 
 			return false;
 		}
 
 		return true;
 	}	  
+	
+	//Sets/Gets Primary Field 
+	
+	public function setPrimaryField($value){
+		$this->PrimaryField = $value;
+	}
+	
+	public function getPrimaryField(){
+		return $this->PrimaryField
+	}
 	
 	public function __destruct(){
 		$this->closeDatabase();
