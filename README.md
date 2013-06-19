@@ -31,6 +31,18 @@ Their respective arrays are the values that you want to assign them.```
 $obj->randomize(<tablename>, <values array>);
 ```
 
+__Update:__
+Added functions incrementOperation() and decrementOperation() to increase or decrease value of records of a table randomly.
+
+```php
+$obj = new Randomizer("<hostname>", "<username>", "<password>", "<tablename>");
+
+$values = array("1", "2", "3");
+$obj->decrementOperation("<table name>", "<column name>", <value array>);
+echo ($obj->randomizer_error());
+
+```
+
 __Note:__ If you want to change values of your db repeatedly (for real-time apps demo) then call this page with setInterval() or similar function
 
 ### Full Code Example:

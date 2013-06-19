@@ -16,6 +16,7 @@
 	$values = array("1", "2", "3");
 	$obj->decrementOperation("table1", "value", $values);
 	echo ($obj->randomizer_error());
+	
 	// assign random values to columns
 	$values = array(
 	    'username' => array('Ram Prasad', 'Hari Gopal', 'Shyam Kesari'), 
