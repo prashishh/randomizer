@@ -13,6 +13,9 @@
 	// pass database config
 	$obj = new Randomizer("localhost", "root", "", "tabledata");
 
+	$values = array("1", "2", "3");
+	$obj->decrementOperation("table1", "value", $values);
+	echo ($obj->randomizer_error());
 	// assign random values to columns
 	$values = array(
 	    'username' => array('Ram Prasad', 'Hari Gopal', 'Shyam Kesari'), 
@@ -20,8 +23,9 @@
 	    'role' => array('Staff', 'Teacher', 'Lecturer'), 
 	    'status' => array('Banned', 'Active')
 	    );
-	    		// call this function to start operation
-		$obj->randomize("table1", $values);
+	    
+    // call this function to start operation
+	//$obj->randomize("table1", $values);
 
 /*
 	// calls function after every 2 second

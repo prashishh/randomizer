@@ -1,4 +1,4 @@
-<?php
+wampwa<?php
 
 class Randomizer
 {
@@ -13,6 +13,7 @@ class Randomizer
 	protected $PrimaryField =  "ID";
 	protected $data;
 	protected $op = array(0=>"insert", 1=>"update", 2=>"delete"); //mimimizes the use of function
+	
 	function __construct($host, $user, $pass, $db) {
 		$this->hostname = $host;
 		$this->username = $user;
@@ -25,20 +26,15 @@ class Randomizer
 	// create database connection 
 	private function connectDatabase() {
 		
-		if($this->connection = mysql_connect($this->hostname,$this->username,$this->password)){ 
-			$this->error="Could not connect to databse. Search more for MySQL Error #".mysql_errno();
-			return false;
-		}
-		if(mysql_select_db($this->database, $this->connection)){
-			$this->error = "Could not select the databse. Search more for MySQL Error #". mysql_errno();
-			return false;
-		}
+		$this->connection = mysql_connect($this->hostname,$this->username,$this->password);
+		mysql_select_db($this->database, $this->connection);
+		
 		return true;
 	}
 
 	// close database connection
 	private function closeDatabase() {
-		if($this->connection){mysql_close($this->connection)}
+		if($this->connection){mysql_close($this->connection);}
 	}
 
 	// randomize main function
@@ -137,14 +133,37 @@ class Randomizer
 		return true;
 	}	  
 	
+	// increment records by a random value of a table
+	public function incrementOperation($table, $column, $values = array("1")) {
+		$random_value = $this->getRandom(sizeof($values)-1);
+
+		// increment
+		if(!mysql_query('UPDATE ' . $table . ' SET ' . $column . '=' . $column . '+' . $values[$random_value] . ';', $this->connection)){
+		$this->error = "Could not Increment in Databse. MySQL Error: ". mysql_error();
+		return false;
+		}
+		return true;
+	}
+
+	// decrement records by a random value of a table
+	public function decrementOperation($table, $column, $values = array("1")) {
+		$random_value = $this->getRandom(sizeof($values)-1);
+
+		// decrement
+		if(!mysql_query('UPDATE ' . $table . ' SET ' . $column . '=' . $column . '-' . $values[$random_value] . ';', $this->connection)){
+			$this->error = "Could not Increment in Databse. MySQL Error: ". mysql_error();
+			return false;
+		}
+		return true;
+	}
+
 	//Sets/Gets Primary Field 
-	
 	public function setPrimaryField($value){
 		$this->PrimaryField = $value;
 	}
 	
 	public function getPrimaryField(){
-		return $this->PrimaryField
+		return $this->PrimaryField;
 	}
 	
 	public function __destruct(){
