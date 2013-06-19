@@ -105,11 +105,11 @@ class Randomizer
 		echo $temp_keys[$random_column] . ' -> ' . $temp_array[$temp_keys[$random_column]][$random_row] . '<br>';
 
 		// get random array from sql table
-		$result = mysql_query('SELECT ID FROM ' . $table . ' LIMIT 1;', $this->connection) or die(mysql_error());
+		$result = mysql_query('SELECT '.$this->PrimaryField.' FROM ' . $table . ' LIMIT 1;', $this->connection) or die(mysql_error());
 		$random_id = mysql_fetch_row($result);
 		
 		// update query
-		if(!mysql_query('UPDATE ' . $table . ' SET ' . $temp_keys[$random_column] . '="' . $temp_array[$temp_keys[$random_column]][$random_row] . '" WHERE ID = "' . $random_id[0] . '";', $this->connection)){
+		if(!mysql_query('UPDATE ' . $table . ' SET ' . $temp_keys[$random_column] . '="' . $temp_array[$temp_keys[$random_column]][$random_row] . '" WHERE '.$this->PrimaryField.' = "' . $random_id[0] . '";', $this->connection)){
 			$this->error = "Could not Update in Databse. MySQL Error: ". mysql_error();
 			return false;
 		}
